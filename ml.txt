@@ -1,0 +1,1300 @@
+tep 5: fit_transform()
+data = LE.fit_transform(df['Gender'])
+
+Ye sabse important line hai.
+
+Isme 2 kaam hote hain:
+
+Part A: fit()
+LE.fit(df['Gender'])
+
+Encoder sab unique values find karta hai.
+
+Column:
+
+Male
+Female
+Male
+Female
+Female
+
+Unique values:
+
+Female
+Male
+Internal Sorting
+
+LabelEncoder alphabetically sort karta hai.
+
+Female
+Male
+
+Because:
+
+F < M
+Mapping Create
+Female → 0
+Male   → 1
+
+Memory:
+
+{
+ 'Female':0,
+ 'Male':1
+}
+Part B: transform()
+
+Ab actual replacement hoti hai.
+
+Original:
+
+Male
+Female
+Male
+Female
+Female
+
+Mapping:
+
+Female → 0
+Male   → 1
+
+Conversion:
+
+Original	Encoded
+Male	1
+Female	0
+Male	1
+Female	0
+Female	0
+
+Result:
+
+[1 0 1 0 0]
+
+Ye array data mein store hota hai.
+
+data = [1 0 1 0 0]
+
+tep 6: Add New Column
+df['Encoded_Gender'] = data
+
+Pandas new column create karta hai.
+
+Before:
+
+Gender
+Male
+Female
+Male
+Female
+Female
+
+After:
+
+Gender	Encoded_Gender
+Male	1
+Female	0
+Male	1
+Female	0
+Female	0
+Bilkul. Ye **One Hot Encoding** Machine Learning mein bahut important topic hai. Chaliye **line by line**, **memory level**, aur **Hinglish** mein samajhte hain.
+
+---
+
+# Complete Code
+
+```python
+from sklearn.preprocessing import OneHotEncoder
+
+OHE = OneHotEncoder(sparse_output=False)
+
+df1 = pd.DataFrame({
+    'products':['laptop','Ac','tv','Mobile','Laptop','AC','fridge']
+})
+
+data = OHE.fit_transform(df1[['products']])
+
+names = OHE.get_feature_names_out(['products'])
+
+df = pd.DataFrame(data, columns=names)
+
+df['Products'] = df1
+
+df = df[df.columns[[-1, 0, 1, 2, 3]]]
+
+print(df)
+```
+
+---
+
+# Step 1: Create OneHotEncoder Object
+
+```python
+OHE = OneHotEncoder(sparse_output=False)
+```
+
+### Kya hota hai?
+
+Ek OneHotEncoder object create hota hai.
+
+```text
+OHE
+ ↓
+OneHotEncoder Object
+```
+
+---
+
+### sparse_output=False
+
+Default output:
+
+```python
+[[0 1 0 0]]
+```
+
+Sparse Matrix format mein aata hai.
+
+Hum readable format chahte hain.
+
+Isliye:
+
+```python
+sparse_output=False
+```
+
+Output:
+
+```python
+[[0. 1. 0. 0.]]
+```
+
+Normal NumPy array milega.
+
+---
+
+# Step 2: Create DataFrame
+
+```python
+df1 = pd.DataFrame({
+    'products':['laptop','Ac','tv','Mobile','Laptop','AC','fridge']
+})
+```
+
+DataFrame:
+
+| Index | products |
+| ----- | -------- |
+| 0     | laptop   |
+| 1     | Ac       |
+| 2     | tv       |
+| 3     | Mobile   |
+| 4     | Laptop   |
+| 5     | AC       |
+| 6     | fridge   |
+
+---
+
+## Important Observation
+
+Notice:
+
+```python
+Ac
+AC
+```
+
+and
+
+```python
+laptop
+Laptop
+```
+
+OneHotEncoder case-sensitive hota hai.
+
+Matlab:
+
+```python
+Ac ≠ AC
+
+laptop ≠ Laptop
+```
+
+Ye alag categories maani jayengi.
+
+---
+
+# Step 3: fit_transform()
+
+```python
+data = OHE.fit_transform(df1[['products']])
+```
+
+Isme 2 kaam hote hain.
+
+---
+
+## Part A : fit()
+
+Encoder sab unique categories identify karta hai.
+
+Column:
+
+```text
+laptop
+Ac
+tv
+Mobile
+Laptop
+AC
+fridge
+```
+
+Unique Categories:
+
+```text
+AC
+Ac
+Laptop
+Mobile
+fridge
+laptop
+tv
+```
+
+---
+
+### Internal Mapping
+
+OneHotEncoder numbering nahi karta.
+
+Har category ke liye ek naya column banata hai.
+
+```text
+AC
+Ac
+Laptop
+Mobile
+fridge
+laptop
+tv
+```
+
+---
+
+## Part B : transform()
+
+Har row ke liye:
+
+* Apni category wale column me 1
+* Baaki sab me 0
+
+---
+
+### Example 1
+
+Product:
+
+```python
+laptop
+```
+
+Output:
+
+```python
+AC      0
+Ac      0
+Laptop  0
+Mobile  0
+fridge  0
+laptop  1
+tv      0
+```
+
+---
+
+### Example 2
+
+Product:
+
+```python
+Ac
+```
+
+Output:
+
+```python
+AC      0
+Ac      1
+Laptop  0
+Mobile  0
+fridge  0
+laptop  0
+tv      0
+```
+
+---
+
+### Example 3
+
+Product:
+
+```python
+tv
+```
+
+Output:
+
+```python
+AC      0
+Ac      0
+Laptop  0
+Mobile  0
+fridge  0
+laptop  0
+tv      1
+```
+
+---
+
+# Step 4: get_feature_names_out()
+
+```python
+names = OHE.get_feature_names_out(['products'])
+```
+
+Ye generated column names return karta hai.
+
+Output:
+
+```python
+[
+'products_AC',
+'products_Ac',
+'products_Laptop',
+'products_Mobile',
+'products_fridge',
+'products_laptop',
+'products_tv'
+]
+```
+
+Store in:
+
+```python
+names
+```
+
+---
+
+# Step 5: Create DataFrame
+
+```python
+df = pd.DataFrame(data, columns=names)
+```
+
+Output:
+
+| products_AC | products_Ac | products_Laptop | products_Mobile | products_fridge | products_laptop | products_tv |
+| ----------- | ----------- | --------------- | --------------- | --------------- | --------------- | ----------- |
+| 0           | 0           | 0               | 0               | 0               | 1               | 0           |
+| 0           | 1           | 0               | 0               | 0               | 0               | 0           |
+| 0           | 0           | 0               | 0               | 0               | 0               | 1           |
+| 0           | 0           | 0               | 1               | 0               | 0               | 0           |
+| 0           | 0           | 1               | 0               | 0               | 0               | 0           |
+| 1           | 0           | 0               | 0               | 0               | 0               | 0           |
+| 0           | 0           | 0               | 0               | 1               | 0               | 0           |
+
+---
+
+# Step 6: Add Original Column
+
+```python
+df['Products'] = df1
+```
+
+Naya column add ho jayega.
+
+Output:
+
+| products_AC | products_Ac | ... | Products |
+| ----------- | ----------- | --- | -------- |
+| 0           | 0           | ... | laptop   |
+| 0           | 1           | ... | Ac       |
+| 0           | 0           | ... | tv       |
+
+---
+
+# Step 7: Fancy Indexing
+
+```python
+df = df[df.columns[[-1,0,1,2,3]]]
+```
+
+Samajhte hain.
+
+---
+
+### df.columns
+
+```python
+[
+'products_AC',
+'products_Ac',
+'products_Laptop',
+'products_Mobile',
+'products_fridge',
+'products_laptop',
+'products_tv',
+'Products'
+]
+```
+
+Indexes:
+
+```python
+0 -> products_AC
+1 -> products_Ac
+2 -> products_Laptop
+3 -> products_Mobile
+4 -> products_fridge
+5 -> products_laptop
+6 -> products_tv
+7 -> Products
+```
+
+---
+
+### Selecting
+
+```python
+[-1,0,1,2,3]
+```
+
+means:
+
+```python
+Products
+products_AC
+products_Ac
+products_Laptop
+products_Mobile
+```
+
+Only ye columns rakhe jayenge.
+
+---
+
+### Final Output
+
+| Products | products_AC | products_Ac | products_Laptop | products_Mobile |
+| -------- | ----------- | ----------- | --------------- | --------------- |
+| laptop   | 0           | 0           | 0               | 0               |
+| Ac       | 0           | 1           | 0               | 0               |
+| tv       | 0           | 0           | 0               | 0               |
+| Mobile   | 0           | 0           | 0               | 1               |
+| Laptop   | 0           | 0           | 1               | 0               |
+| AC       | 1           | 0           | 0               | 0               |
+| fridge   | 0           | 0           | 0               | 0               |
+
+---
+
+# Why One Hot Encoding?
+
+Agar Label Encoding karte:
+
+```python
+Laptop = 0
+AC = 1
+TV = 2
+Mobile = 3
+```
+
+Model samjhega:
+
+```text
+Mobile > TV > AC > Laptop
+```
+
+Ye galat hai.
+
+Products ka koi order nahi hota.
+
+Isliye One Hot Encoding use karte hain.
+
+---
+
+# Interview Answer
+
+**What is One Hot Encoding?**
+
+> One Hot Encoding categorical values ko multiple binary columns mein convert karta hai. Har category ke liye ek alag column banta hai aur us category ke liye value 1, baaki sab ke liye 0 hoti hai.
+
+Example:
+
+```text
+Product
+------
+Laptop
+TV
+AC
+```
+
+↓
+
+```text
+Laptop TV AC
+1      0  0
+0      1  0
+0      0  1
+```
+
+Isse machine learning model categorical data ko bina false ordering ke samajh pata hai.
+
+Chaliye is line ko **step by step Hinglish** mein samajhte hain.
+
+## Code
+
+```python
+df = pd.get_dummies(df, dtype=int, drop_first=True)
+df
+```
+
+---
+
+# get_dummies() Kya Karta Hai?
+
+`pd.get_dummies()` categorical columns ko automatically **One Hot Encoding** mein convert karta hai.
+
+Example:
+
+### Original Data
+
+| Gender |
+| ------ |
+| Male   |
+| Female |
+| Male   |
+
+```python
+df = pd.DataFrame({
+    'Gender':['Male','Female','Male']
+})
+```
+
+---
+
+# Without get_dummies()
+
+Machine Learning text ko nahi samajhta:
+
+```text
+Male
+Female
+```
+
+Isliye convert karna padta hai.
+
+---
+
+# Step 1: get_dummies()
+
+```python
+pd.get_dummies(df)
+```
+
+Output:
+
+| Gender_Female | Gender_Male |
+| ------------- | ----------- |
+| 0             | 1           |
+| 1             | 0           |
+| 0             | 1           |
+
+Har category ke liye ek naya column ban gaya.
+
+---
+
+# Step 2: dtype=int
+
+```python
+pd.get_dummies(df, dtype=int)
+```
+
+Normally output:
+
+```python
+True
+False
+```
+
+ya
+
+```python
+1.0
+0.0
+```
+
+aa sakta hai.
+
+`dtype=int` se:
+
+```python
+1
+0
+```
+
+integer values milengi.
+
+Output:
+
+| Gender_Female | Gender_Male |
+| ------------- | ----------- |
+| 0             | 1           |
+| 1             | 0           |
+| 0             | 1           |
+
+---
+
+# Step 3: drop_first=True
+
+Sabse important parameter.
+
+```python
+drop_first=True
+```
+
+Ek dummy column delete kar deta hai.
+
+---
+
+### Example
+
+Categories:
+
+```text
+Female
+Male
+```
+
+Normally:
+
+| Female | Male |
+| ------ | ---- |
+| 1      | 0    |
+| 0      | 1    |
+
+2 columns bante.
+
+---
+
+### After drop_first=True
+
+Pehla column remove:
+
+| Male |
+| ---- |
+| 0    |
+| 1    |
+
+Ab:
+
+```text
+Male = 1
+Not Male (Female) = 0
+```
+
+Sirf 1 column se kaam ho gaya.
+
+---
+
+# Why drop_first=True?
+
+Machine Learning mein **Dummy Variable Trap** avoid karne ke liye.
+
+Suppose:
+
+| Female | Male |
+| ------ | ---- |
+| 1      | 0    |
+| 0      | 1    |
+
+Yahan:
+
+```text
+Male = 1 - Female
+```
+
+Ek column doosre se calculate ho sakta hai.
+
+Isse:
+
+```text
+Multicollinearity
+```
+
+problem aati hai.
+
+Isliye:
+
+```python
+drop_first=True
+```
+
+use karte hain.
+
+---
+
+# Example
+
+### Original
+
+```python
+df = pd.DataFrame({
+    'Gender':['Male','Female','Male']
+})
+```
+
+---
+
+### Without drop_first
+
+```python
+pd.get_dummies(df,dtype=int)
+```
+
+Output:
+
+| Gender_Female | Gender_Male |
+| ------------- | ----------- |
+| 0             | 1           |
+| 1             | 0           |
+| 0             | 1           |
+
+---
+
+### With drop_first
+
+```python
+pd.get_dummies(df,dtype=int,drop_first=True)
+```
+
+Output:
+
+| Gender_Male |
+| ----------- |
+| 1           |
+| 0           |
+| 1           |
+
+---
+
+# Interview Answer
+
+### What is pd.get_dummies()?
+
+> `pd.get_dummies()` categorical columns ko One Hot Encoded columns mein convert karta hai.
+
+### What does dtype=int do?
+
+> Output values ko integer (0 and 1) format mein convert karta hai.
+
+### What does drop_first=True do?
+
+> Pehli dummy category ko remove karta hai taaki Dummy Variable Trap aur Multicollinearity se bacha ja sake.
+
+### Shortcut Formula
+
+Agar category count = **n**
+
+```text
+Without drop_first:
+n columns
+
+With drop_first:
+n - 1 columns
+```
+
+Example:
+
+```text
+Gender
+-------
+Male
+Female
+```
+
+Without drop_first:
+
+```text
+Gender_Female
+Gender_Male
+```
+
+2 columns
+
+With drop_first:
+
+```text
+Gender_Male
+```
+
+1 column only.
+
+Bilkul. Ye code **automatic One Hot Encoding** karta hai. Interview mein ye bahut important hai kyunki ek hi loop se saare categorical columns encode ho jate hain.
+
+---
+
+# Complete Code
+
+```python
+df1 = df.copy()
+
+for col in df1.columns:
+    if df1[col].dtype == 'object':
+        data = OHE.fit_transform(df1[[col]])
+        names = OHE.get_feature_names_out([col])
+
+        encoded_df = pd.DataFrame(data, columns=names)
+
+        df1 = df1.drop(col, axis=1)
+
+        df1 = pd.concat([df1, encoded_df], axis=1)
+```
+
+---
+
+# Step 1 : Copy DataFrame
+
+```python
+df1 = df.copy()
+```
+
+### Kyu?
+
+Original dataframe safe rahe.
+
+Suppose:
+
+```python
+df
+```
+
+| Gender | City   | Age |
+| ------ | ------ | --- |
+| Male   | Delhi  | 25  |
+| Female | Mumbai | 30  |
+| Male   | Noida  | 22  |
+
+---
+
+After copy:
+
+```python
+df1
+```
+
+| Gender | City   | Age |
+| ------ | ------ | --- |
+| Male   | Delhi  | 25  |
+| Female | Mumbai | 30  |
+| Male   | Noida  | 22  |
+
+Ab saari modifications `df1` mein hongi.
+
+Original `df` change nahi hoga.
+
+---
+
+# Step 2 : Loop Through Columns
+
+```python
+for col in df1.columns:
+```
+
+Columns:
+
+```python
+Gender
+City
+Age
+```
+
+Loop chalega:
+
+### First Iteration
+
+```python
+col = "Gender"
+```
+
+### Second Iteration
+
+```python
+col = "City"
+```
+
+### Third Iteration
+
+```python
+col = "Age"
+```
+
+---
+
+# Step 3 : Check Data Type
+
+```python
+if df1[col].dtype == 'object':
+```
+
+### Why?
+
+One Hot Encoding sirf categorical columns par lagta hai.
+
+Example:
+
+| Column | Type   |
+| ------ | ------ |
+| Gender | object |
+| City   | object |
+| Age    | int    |
+
+---
+
+For Gender
+
+```python
+df1['Gender'].dtype
+```
+
+Output:
+
+```python
+object
+```
+
+Condition True.
+
+---
+
+For City
+
+```python
+df1['City'].dtype
+```
+
+Output:
+
+```python
+object
+```
+
+Condition True.
+
+---
+
+For Age
+
+```python
+df1['Age'].dtype
+```
+
+Output:
+
+```python
+int64
+```
+
+Condition False.
+
+Encoding nahi hogi.
+
+---
+
+# Step 4 : Apply One Hot Encoding
+
+```python
+data = OHE.fit_transform(df1[[col]])
+```
+
+Suppose:
+
+```python
+col='Gender'
+```
+
+Data:
+
+```python
+Male
+Female
+Male
+```
+
+---
+
+## fit()
+
+Unique categories find karta hai.
+
+```python
+Female
+Male
+```
+
+---
+
+## transform()
+
+Convert karta hai:
+
+| Female | Male |
+| ------ | ---- |
+| 0      | 1    |
+| 1      | 0    |
+| 0      | 1    |
+
+Store:
+
+```python
+data
+```
+
+---
+
+# Step 5 : Get Column Names
+
+```python
+names = OHE.get_feature_names_out([col])
+```
+
+If:
+
+```python
+col='Gender'
+```
+
+Output:
+
+```python
+[
+'Gender_Female',
+'Gender_Male'
+]
+```
+
+Store in:
+
+```python
+names
+```
+
+---
+
+# Step 6 : Create Encoded DataFrame
+
+```python
+encoded_df = pd.DataFrame(
+    data,
+    columns=names
+)
+```
+
+Output:
+
+| Gender_Female | Gender_Male |
+| ------------- | ----------- |
+| 0             | 1           |
+| 1             | 0           |
+| 0             | 1           |
+
+---
+
+# Step 7 : Remove Original Column
+
+```python
+df1 = df1.drop(col, axis=1)
+```
+
+Before:
+
+| Gender | City   | Age |
+| ------ | ------ | --- |
+| Male   | Delhi  | 25  |
+| Female | Mumbai | 30  |
+| Male   | Noida  | 22  |
+
+---
+
+After:
+
+| City   | Age |
+| ------ | --- |
+| Delhi  | 25  |
+| Mumbai | 30  |
+| Noida  | 22  |
+
+Gender column remove ho gaya.
+
+---
+
+# Step 8 : Add Encoded Columns
+
+```python
+df1 = pd.concat(
+    [df1, encoded_df],
+    axis=1
+)
+```
+
+`axis=1` means side-by-side join.
+
+---
+
+Before:
+
+| City   | Age |
+| ------ | --- |
+| Delhi  | 25  |
+| Mumbai | 30  |
+| Noida  | 22  |
+
+Encoded:
+
+| Gender_Female | Gender_Male |
+| ------------- | ----------- |
+| 0             | 1           |
+| 1             | 0           |
+| 0             | 1           |
+
+---
+
+After concat:
+
+| City   | Age | Gender_Female | Gender_Male |
+| ------ | --- | ------------- | ----------- |
+| Delhi  | 25  | 0             | 1           |
+| Mumbai | 30  | 1             | 0           |
+| Noida  | 22  | 0             | 1           |
+
+---
+
+# Next Iteration
+
+Now:
+
+```python
+col='City'
+```
+
+Encoding:
+
+| City   |
+| ------ |
+| Delhi  |
+| Mumbai |
+| Noida  |
+
+↓
+
+| City_Delhi | City_Mumbai | City_Noida |
+| ---------- | ----------- | ---------- |
+| 1          | 0           | 0          |
+| 0          | 1           | 0          |
+| 0          | 0           | 1          |
+
+---
+
+City column remove hoga.
+
+New encoded columns add ho jayenge.
+
+---
+
+# Final DataFrame
+
+| Age | Gender_Female | Gender_Male | City_Delhi | City_Mumbai | City_Noida |
+| --- | ------------- | ----------- | ---------- | ----------- | ---------- |
+| 25  | 0             | 1           | 1          | 0           | 0          |
+| 30  | 1             | 0           | 0          | 1           | 0          |
+| 22  | 0             | 1           | 0          | 0           | 1          |
+
+---
+
+# Memory Flow
+
+```text
+Gender
+   ↓
+One Hot Encode
+   ↓
+Gender_Female
+Gender_Male
+   ↓
+Drop Gender
+   ↓
+Add Encoded Columns
+
+City
+   ↓
+One Hot Encode
+   ↓
+City_Delhi
+City_Mumbai
+City_Noida
+   ↓
+Drop City
+   ↓
+Add Encoded Columns
+
+Age
+   ↓
+Not object
+   ↓
+Skip
+```
+
+---
+
+# Interview Answer
+
+**What is the purpose of this loop?**
+
+> This loop automatically identifies all categorical (`object`) columns in a DataFrame, applies One Hot Encoding to each column, removes the original categorical column, and adds the encoded columns back into the DataFrame. This automates preprocessing for machine learning models.
+
+### Shortcut
+
+```python
+for col in df1.columns:
+```
+
+➡️ Check every column
+
+```python
+if dtype == 'object'
+```
+
+➡️ Categorical column mila
+
+```python
+fit_transform()
+```
+
+➡️ One Hot Encode
+
+```python
+drop()
+```
+
+➡️ Original column remove
+
+```python
+concat()
+```
+
+➡️ Encoded columns add
+
+Ye process har categorical column ke liye repeat hota hai.
